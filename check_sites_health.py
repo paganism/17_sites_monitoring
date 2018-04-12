@@ -57,6 +57,7 @@ def parse_arguments():
 
 
 if __name__ == '__main__':
+    days_count = 30
     args = parse_arguments()
     if not os.path.exists(args.path):
         sys.exit('Path does not exist')
@@ -66,14 +67,13 @@ if __name__ == '__main__':
         domain_name = get_domain_name(url)
         status_code = is_server_respond_with_200(url)
         exp_date = get_domain_expiration_date(domain_name)
-        if not status_code or not exp_date:
-            print('Domain: | {} | is not healthy'.format(domain_name))
-            print('-----------------------------------------')
-        else:
+        if status_code and exp_date:
             delta_time = check_expiration_date(exp_date)
-            if delta_time >= timedelta(30):
-                print('Domain: | {} | healthy and expire in {}'.format(
+            print('Domain: | {} | healthy and expire in {}'.format(
                     domain_name,
                     delta_time)
                 )
-                print('-----------------------------------------')
+            print('-----------------------------------------')
+        else:
+            print('Domain: | {} | is not healthy'.format(domain_name))
+            print('-----------------------------------------')
