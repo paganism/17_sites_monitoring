@@ -21,7 +21,7 @@ def get_domain_name(url):
     return domain_name
 
 
-def is_server_respond_with_200(url):
+def is_server_respond_with_ok(url):
     try:
         response = requests.get(url)
         return response.ok
@@ -32,15 +32,20 @@ def is_server_respond_with_200(url):
 def get_domain_expiration_date(domain_name):
     try:
         domain_info = whois.query(domain_name)
-        return domain_info.expiration_date
-    except AttributeError:
+        if isinstance(domain_info.expiration_date, list):
+            return domain_info.expiration_date[0]
+        else:
+            return domain_info.expiration_date
+    except TypeError:
         return None
 
 
-def check_expiration_date(expiration_date):
+def check_expiration_date(expiration_date, days_count):
+    current_date = datetime.now()
     try:
-        delta = expiration_date - datetime.now()
-        return delta
+        return bool((
+                        expiration_date - current_date) > timedelta(days_count)
+                    )
     except ValueError:
         return None
 
@@ -65,15 +70,14 @@ if __name__ == '__main__':
     url_list = load_urls_from_file(filepath)
     for url in url_list:
         domain_name = get_domain_name(url)
-        status_code = is_server_respond_with_200(url)
+        status_code = is_server_respond_with_ok(url)
         exp_date = get_domain_expiration_date(domain_name)
-        if status_code and exp_date:
-            delta_time = check_expiration_date(exp_date)
-            print('Domain: | {} | healthy and expire in {}'.format(
-                    domain_name,
-                    delta_time)
-                )
-            print('-----------------------------------------')
+        paid_for_month = check_expiration_date(exp_date, days_count)
+        print('-----------------------------------------')
+        print('Domain {}'.format(domain_name))
+        print('Is it respond OK?: {}'.format(status_code))
+        if paid_for_month:
+            print('Domain is paid for month')
         else:
-            print('Domain: | {} | is not healthy'.format(domain_name))
-            print('-----------------------------------------')
+            print('Domain is not paid for month')
+        print('-----------------------------------------')
