@@ -73,11 +73,11 @@ if __name__ == '__main__':
         status_code = is_server_respond_with_ok(url)
         exp_date = get_domain_expiration_date(domain_name)
         paid_for_month = check_expiration_date(exp_date, days_count)
-        print('-----------------------------------------')
+        print('-' * 30)
         print('Domain {}'.format(domain_name))
         print('Is it respond OK?: {}'.format(status_code))
         if paid_for_month:
             print('Domain is paid for month')
         else:
             print('Domain is not paid for month')
-        print('-----------------------------------------')
+        print('-' * 30)
