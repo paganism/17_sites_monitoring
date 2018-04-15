@@ -5,6 +5,7 @@ import requests
 import sys
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
+from requests import RequestException
 
 
 def load_urls_from_file(filepath):
@@ -22,8 +23,11 @@ def get_domain_name(url):
 
 
 def is_server_respond_with_ok(url):
-    response = requests.get(url)
-    return response.ok
+    try:
+        response = requests.get(url)
+        return response.ok
+    except RequestException:
+        return False
 
 
 def get_domain_expiration_date(domain_name):
