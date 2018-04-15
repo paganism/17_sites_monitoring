@@ -22,11 +22,8 @@ def get_domain_name(url):
 
 
 def is_server_respond_with_ok(url):
-    try:
-        response = requests.get(url)
-        return response.ok
-    except ValueError:
-        return False
+    response = requests.get(url)
+    return response.ok
 
 
 def get_domain_expiration_date(domain_name):
@@ -43,10 +40,8 @@ def get_domain_expiration_date(domain_name):
 def check_expiration_date(expiration_date, days_count):
     current_date = datetime.now()
     try:
-        return bool((
-                        expiration_date - current_date) > timedelta(days_count)
-                    )
-    except ValueError:
+        return (expiration_date - current_date) > timedelta(days_count)
+    except TypeError:
         return None
 
 
@@ -61,6 +56,15 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def print_output(domain_name, status_code, paid_period):
+    delimiter = '-' * 30
+    print(delimiter)
+    print('Domain {}'.format(domain_name))
+    print('Is it respond OK?: {}'.format(status_code))
+    print('Is domain paid? {}'.format(paid_period))
+    print(delimiter)
+
+
 if __name__ == '__main__':
     days_count = 30
     args = parse_arguments()
@@ -72,12 +76,5 @@ if __name__ == '__main__':
         domain_name = get_domain_name(url)
         status_code = is_server_respond_with_ok(url)
         exp_date = get_domain_expiration_date(domain_name)
-        paid_for_month = check_expiration_date(exp_date, days_count)
-        print('-' * 30)
-        print('Domain {}'.format(domain_name))
-        print('Is it respond OK?: {}'.format(status_code))
-        if paid_for_month:
-            print('Domain is paid for month')
-        else:
-            print('Domain is not paid for month')
-        print('-' * 30)
+        paid_period = check_expiration_date(exp_date, days_count)
+        print_output(domain_name, status_code, paid_period)
