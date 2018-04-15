@@ -40,7 +40,7 @@ def get_domain_expiration_date(domain_name):
 def check_expiration_date(expiration_date, days_count):
     current_date = datetime.now()
     try:
-        return (expiration_date - current_date) > timedelta(days_count)
+        return expiration_date - current_date > timedelta(days_count)
     except TypeError:
         return None
 
