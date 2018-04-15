@@ -28,12 +28,12 @@ def is_server_respond_with_ok(url):
 
 def get_domain_expiration_date(domain_name):
     try:
-        domain_info = whois.query(domain_name)
+        domain_info = whois.whois(domain_name)
         if isinstance(domain_info.expiration_date, list):
             return domain_info.expiration_date[0]
         else:
             return domain_info.expiration_date
-    except TypeError:
+    except AttributeError:
         return None
 
 
@@ -42,7 +42,7 @@ def check_expiration_date(expiration_date, days_count):
     try:
         return expiration_date - current_date > timedelta(days_count)
     except TypeError:
-        return None
+        return False
 
 
 def parse_arguments():
@@ -56,12 +56,12 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def print_output(domain_name, status_code, paid_period):
+def print_output(domain_name, status_code, id_domain_paid):
     delimiter = '-' * 30
     print(delimiter)
     print('Domain {}'.format(domain_name))
     print('Is it respond OK?: {}'.format(status_code))
-    print('Is domain paid? {}'.format(paid_period))
+    print('Is domain paid? {}'.format(id_domain_paid))
     print(delimiter)
 
 
@@ -76,5 +76,5 @@ if __name__ == '__main__':
         domain_name = get_domain_name(url)
         status_code = is_server_respond_with_ok(url)
         exp_date = get_domain_expiration_date(domain_name)
-        paid_period = check_expiration_date(exp_date, days_count)
-        print_output(domain_name, status_code, paid_period)
+        is_domain_paid = check_expiration_date(exp_date, days_count)
+        print_output(domain_name, status_code, is_domain_paid)
